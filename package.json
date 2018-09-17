@@ -1,0 +1,43 @@
+{
+  "name": "i18n-v11n-client",
+  "version": "1.0.0",
+  "description": "i18n-v11n client",
+  "scripts": {
+    "start": "bigroom dev",
+    "build": "bigroom build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "antd": "^3.9.2",
+    "axios": "^0.18.0",
+    "babel-loader": "^8.0.2",
+    "fe-utils": "^1.1.6",
+    "moment": "^2.22.2",
+    "react": "^16.5.0",
+    "react-dom": "^16.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-plugin-import": "^1.8.0",
+    "bable-loader": "0.0.1-security",
+    "css-loader": "^1.0.0",
+    "eslint": "^5.5.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-loader": "^2.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
+    "less": "^3.8.1",
+    "less-loader": "^4.1.0",
+    "style-loader": "^0.23.0",
+    "webpack-hot-middleware": "^2.23.1"
+  },
+  "template": {
+    "type": "chrome-extension",
+    "framework": "react"
+  }
+}

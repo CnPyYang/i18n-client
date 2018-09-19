@@ -26,7 +26,7 @@ const contentjs = {
     document.body.appendChild(div);
 
     const script = document.createElement('script')
-    const content = env === 'production' ? chrome.extension.getURL('modules/content/content.js') : `http://127.0.0.1:${port}/${publicPath}content.bundle.js`;
+    const content = env === 'production' ? chrome.extension.getURL('modules/content/content.bundle.js') : `http://127.0.0.1:${port}/${publicPath}content.bundle.js`;
     script.setAttribute('type', 'text/javascript')
     script.setAttribute('src', content);
     document.body.appendChild(script);
@@ -36,8 +36,6 @@ const contentjs = {
 
   listen() {
     this.onMessage(({ action, data }, sender, response) => { // eslint-disable-line
-      console.log(action);
-
       switch (action) {
         case 'init':
           this.data = Object.assign({}, data);

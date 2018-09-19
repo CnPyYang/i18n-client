@@ -19,6 +19,9 @@
       "all_frames": true
     }
   ],
-  "permissions": ["http://*.candy.one/*", "https://*.candy.one/*", "cookies"],
-  "content_security_policy": "default-src 'self'; script-src 'self' http://127.0.0.1:3000 http://localhost:3000 'unsafe-eval'; connect-src http://127.0.0.1:7001 http://localhost:7001; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "permissions": ["http://*.candy.one/*", "https://*.candy.one/*"],
+  "web_accessible_resources": [
+    "modules/content/content.bundle.js"
+  ],
+  "content_security_policy": "default-src 'self'; script-src 'self'; style-src * 'unsafe-inline'; img-src 'self' data:;"
 }

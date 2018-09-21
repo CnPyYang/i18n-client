@@ -16,8 +16,8 @@ class App extends Component {
   }
 
   componentWillMount() {
-    Cookies.get(COOKIE_TOKEN, ({ value }) => {
-      const isLogin = !!value;
+    Cookies.get(COOKIE_TOKEN, (cookie) => {
+      const isLogin = cookie && !!cookie.value;
       this.setState({
         isLogin,
         checkLogin: false,

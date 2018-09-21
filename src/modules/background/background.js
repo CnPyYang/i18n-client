@@ -1,7 +1,5 @@
 import { initContent } from './senders';
 
-const { chrome } = window;
-
 const backgroundjs = {
   sendMessage(action, callback) {
     chrome.runtime.sendMessage({ action }, (data, sender, response) => {
@@ -42,6 +40,7 @@ const backgroundjs = {
   },
 
   run() {
+    console.log(123)
     // todo
   },
 };

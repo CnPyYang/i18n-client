@@ -31,13 +31,13 @@ const request = {
     if (token) {
       headers['x-access-token'] = token;
     }
-
+    console.log(headers);
     return headers;
   },
 
   request({ url, method, params = {}, data = {} }) {
     const headers = this.getHeader();
-
+    console.log(data);
     const transform = (_params) => {
       let ret = ''
       Object.keys(_params).forEach((key) => {

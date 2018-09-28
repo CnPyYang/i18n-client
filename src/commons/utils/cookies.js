@@ -54,6 +54,20 @@ const Cookies = {
       Promise.all(tasks).then(values => callback(values));
     });
   },
+
+  allRemove(names, url) {
+    names.forEach((name) => {
+      chrome.cookies.remove({
+        name,
+        url,
+      }, () => {
+
+      })
+    });
+    // chrome.cookies.getAll({}, (cookies) => {
+    //   console.log(222, cookies);
+    // });
+  },
 }
 
 export default Cookies;

@@ -1,21 +1,29 @@
 import { initContent } from './senders';
+import Cookies from '../../commons/utils/cookies';
 
+const noop = () => {};
 const backgroundjs = {
-  sendMessage(action, callback) {
+  sendMessage(action, callback = noop) {
     chrome.runtime.sendMessage({ action }, (data, sender, response) => {
       callback(data, sender, response);
     });
   },
 
-  onMessage(callback) {
+  onMessage(callback = noop) {
     chrome.runtime.onMessage.addListener((data, sender, response) => {
       callback(data, sender, response);
     });
   },
 
-  listenContent({ action, data }, sender, response) { // eslint-disable-line
+  removeCookie(data, url) {
+    Cookies.allRemove(data, url);
+    backgroundjs.sendMessage('relogin');
+  },
+
+  listenContent({ action, data, url }, sender, response) { // eslint-disable-line
     switch (action) {
       case 'init': initContent(); break;
+      case 'user_token': this.removeCookie(data, url); break;
       default: break;
     }
   },
@@ -27,9 +35,8 @@ const backgroundjs = {
   },
 
   listen() {
-    this.onMessage(({ _from, action, data }, sender, response) => {
-      const params = [{ action, data }, sender, response];
-
+    this.onMessage(({ _from, action, data, url }, sender, response) => {
+      const params = [{ action, data, url }, sender, response];
       if (_from === 'content') {
         this.listenContent(...params);
       } else if (_from === 'popup') {
@@ -40,7 +47,6 @@ const backgroundjs = {
   },
 
   run() {
-    console.log(123)
     // todo
   },
 };

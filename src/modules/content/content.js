@@ -1,10 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+// import React from 'react';
+// import ReactDOM from 'react-dom';
 
-import { injectRootDom, onMessage, sendMessage } from './util';
-import App from './App';
+import { getRootDom, onMessage } from './util';
+// import App from './App';
 
-const contentId = 'chrome-content-root';
+// const contentId = 'chrome-content-root';
 
 onMessage(({ action, data }, sender, response) => { // eslint-disable-line
   switch (action) {
@@ -15,8 +15,8 @@ onMessage(({ action, data }, sender, response) => { // eslint-disable-line
     default: break;
   }
 });
+getRootDom();
+// sendMessage('i18n_v11n_token');
+// injectRootDom(contentId);
 
-sendMessage('init');
-injectRootDom(contentId);
-
-ReactDOM.render(<App />, document.getElementById(contentId));
+// ReactDOM.render(<App />, document.getElementById(contentId));

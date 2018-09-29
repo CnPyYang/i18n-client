@@ -26,26 +26,24 @@ const request = {
 
   getHeader() {
     const token = Cookie.getCookie(COOKIE_TOKEN);
-    const headers = {};
+    const headers = { 'Content-Type': 'application/json' };
 
     if (token) {
       headers['x-access-token'] = token;
     }
-    console.log(headers);
     return headers;
   },
 
   request({ url, method, params = {}, data = {} }) {
     const headers = this.getHeader();
-    console.log(data);
-    const transform = (_params) => {
-      let ret = ''
-      Object.keys(_params).forEach((key) => {
-        const item = data[key];
-        ret += `${encodeURIComponent(key)}=${item}&`;
-      });
-      return ret;
-    };
+    // const transform = (_params) => {
+    //   let ret = ''
+    //   Object.keys(_params).forEach((key) => {
+    //     const item = params[key];
+    //     ret += `${encodeURIComponent(key)}=${item}&`;
+    //   });
+    //   return ret;
+    // };
 
     return axios.request({
       method,
@@ -53,7 +51,7 @@ const request = {
       params,
       headers,
       data,
-      transformRequest: [transform],
+      // transformRequest: [transform],
       validateStatus: (status) => {
         this.checkStatus(status);
         return status >= 200 && status <= 500 && status !== 404 && status !== 401;
@@ -84,6 +82,7 @@ const request = {
   },
 
   post(params) {
+    console.log(params);
     const res = this.checkParams(params).request({
       method: 'post',
       url: params.url,

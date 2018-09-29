@@ -17,8 +17,8 @@ function hasErrors(fieldsError) {
 }
 
 class Login extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       errMsg: '',
     }
@@ -51,7 +51,7 @@ class Login extends Component {
             [COOKIE_USER_ID, data.user.id.toString(), `.${host}`],
             [COOKIE_USER_NAME, values.username, `.${host}`],
           ], () => {
-            console.log('menu start');
+            this.props.changeLogin(true);
           });
         },
       });

@@ -25,14 +25,18 @@ class App extends Component {
     }
   }
 
+  loginState(val) {
+    this.setState({
+      isLogin: val,
+    });
+  }
+
   render() {
     const { isLogin } = this.state;
     return (
       <div className="container">
-        <div className="module-login">
-          <div className="login-title">i18n-v11n</div>
-          { !isLogin ? <Login /> : <Menus /> }
-        </div>
+        {/* <div className="login-title">i18n-v11n</div> */}
+        { !isLogin ? <Login changeLogin={(value) => { (this.loginState(value)) }} /> : <Menus /> }
       </div>
     );
   }

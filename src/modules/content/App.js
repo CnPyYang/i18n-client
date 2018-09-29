@@ -19,7 +19,6 @@ class App extends Component {
     this.state = {
       errMsg: '',
       visible: true,
-      confirmLoading: false,
       data: JSON.parse(window.sessionStorage.getItem('national')),
     };
   }
@@ -44,25 +43,6 @@ class App extends Component {
     return children;
   }
 
-  handleOk() {
-    this.setState({
-      confirmLoading: true,
-    });
-    setTimeout(() => {
-      this.setState({
-        visible: false,
-        confirmLoading: false,
-      });
-    }, 2000);
-  }
-
-  handleCancel() {
-    console.log(this, 'Clicked cancel button');
-    this.setState({
-      visible: false,
-    });
-  }
-
   handleSubmit(e) {
     e.preventDefault();
 
@@ -78,12 +58,11 @@ class App extends Component {
         const tmpdata = {
           url: window.location.protocol + window.location.hostname + window.location.pathname,
           key: this.state.data.datatype,
-          lang_id: tmp[0],
+          lang_id: Number(tmp[0]),
           value: tmp[1],
         };
         postdata.push(tmpdata);
       }
-      console.log(postdata);
       Request.post({
         url: '/i18n/save',
         data: { data: postdata },
@@ -98,17 +77,15 @@ class App extends Component {
 
   render() {
     const { getFieldsError } = this.props.form;
-    const { errMsg, visible, confirmLoading } = this.state;
-
+    const { errMsg, visible } = this.state;
     const errTpl = errMsg ? <div className="login-form-explain">{errMsg}</div> : ''
 
     return (
       <Modal
         title="Title"
+        footer={null}
         visible={visible}
-        onOk={this.handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={this.handleCancel}
+        onCancel={() => { this.setState({ visible: false }) }}
       >
         <Input addonBefore="要翻译的内容:" defaultValue={this.state.data.dataname} disabled />
         <Form onSubmit={e => this.handleSubmit(e)} className="login-form">

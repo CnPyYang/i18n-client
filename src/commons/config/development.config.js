@@ -1,4 +1,4 @@
 export default {
-  baseUrl: 'http://127.0.0.1:7001/api',
+  baseUrl: 'http://192.168.1.90:7001/api',
   host: 'candy.one',
 };

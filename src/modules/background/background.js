@@ -17,7 +17,7 @@ const backgroundjs = {
 
   removeCookie(data, url) {
     Cookies.allRemove(data, url);
-    backgroundjs.sendMessage('relogin');
+    this.sendMessage('relogin');
   },
 
   listenContent({ action, data, url }, sender, response) { // eslint-disable-line
@@ -45,10 +45,6 @@ const backgroundjs = {
     });
     return this;
   },
-
-  run() {
-    // todo
-  },
 };
 
-backgroundjs.listen().run();
+backgroundjs.listen();

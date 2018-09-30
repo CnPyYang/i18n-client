@@ -18,9 +18,38 @@ class App extends Component {
     super(props);
     this.state = {
       errMsg: '',
-      visible: true,
-      data: JSON.parse(window.sessionStorage.getItem('national')),
+      visible: false,
+      datatype: '',
+      dataname: '',
     };
+  }
+
+  componentWillMount() {
+    const tmpDiv = document.querySelectorAll('[data-national]');
+    for (let index = 0; index < tmpDiv.length; index += 1) {
+      const div = tmpDiv[index];
+      const tmpdata = {
+        datatype: div.dataset.national,
+        dataname: div.innerHTML,
+      }
+      const tmp = document.createElement('span');
+      tmp.setAttribute('class', 'redcircle');
+      tmp.setAttribute('data-type', tmpdata.datatype);
+      tmp.setAttribute('data-name', tmpdata.dataname);
+      tmp.onclick = (ev) => {
+        const { dataset } = ev.currentTarget;
+        console.log(this, dataset);
+        if (dataset.type && dataset.name) {
+          this.setState({
+            datatype: dataset.type,
+            dataname: dataset.name,
+            visible: true,
+          })
+        }
+      };
+      tmp.innerHTML = '<svg viewBox="64 64 896 896" class="" data-icon="form" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M904 512h-56c-4.4 0-8 3.6-8 8v320H184V184h320c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H144c-17.7 0-32 14.3-32 32v736c0 17.7 14.3 32 32 32h736c17.7 0 32-14.3 32-32V520c0-4.4-3.6-8-8-8z"></path><path d="M355.9 534.9L354 653.8c-.1 8.9 7.1 16.2 16 16.2h.4l118-2.9c2-.1 4-.9 5.4-2.3l415.9-415c3.1-3.1 3.1-8.2 0-11.3L785.4 114.3c-1.6-1.6-3.6-2.3-5.7-2.3s-4.1.8-5.7 2.3l-415.8 415a8.3 8.3 0 0 0-2.3 5.6zm63.5 23.6L779.7 199l45.2 45.1-360.5 359.7-45.7 1.1.7-46.4z"></path></svg>';
+      div.appendChild(tmp);
+    }
   }
 
   componentDidMount() {
@@ -57,7 +86,7 @@ class App extends Component {
         const tmp = tmpvalues[i];
         const tmpdata = {
           url: window.location.protocol + window.location.hostname + window.location.pathname,
-          key: this.state.data.datatype,
+          key: this.state.datatype,
           lang_id: Number(tmp[0]),
           value: tmp[1],
         };
@@ -69,6 +98,8 @@ class App extends Component {
         done: (value) => {
           if (value.errCode) {
             this.setState({ errMsg: value.errMsg });
+          } else {
+            this.setState({ visible: false });
           }
         },
       });
@@ -87,7 +118,7 @@ class App extends Component {
         visible={visible}
         onCancel={() => { this.setState({ visible: false }) }}
       >
-        <Input addonBefore="要翻译的内容:" defaultValue={this.state.data.dataname} disabled />
+        <Input addonBefore="要翻译的内容:" placeholder={this.state.dataname} disabled />
         <Form onSubmit={e => this.handleSubmit(e)} className="login-form">
           {this.getFields()}
           <FormItem>

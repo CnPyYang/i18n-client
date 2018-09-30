@@ -82,7 +82,6 @@ const request = {
   },
 
   post(params) {
-    console.log(params);
     const res = this.checkParams(params).request({
       method: 'post',
       url: params.url,

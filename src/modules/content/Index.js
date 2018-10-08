@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Table, Button } from 'antd';
+import { Table, Button, Modal } from 'antd';
 
 import { EditableCell, EditableFormRow } from './Table';
 
 const EditableContext = React.createContext();
 const data = [];
-for (let i = 0; i < 10; i += 1) {
+for (let i = 0; i < 3; i += 1) {
   data.push({
     key: i.toString(),
     name: `Edrward ${i}`,
@@ -17,7 +17,12 @@ for (let i = 0; i < 10; i += 1) {
 class EditableTable extends Component {
   constructor(props) {
     super(props);
-    this.state = { data, editingKey: '' };
+    this.state = {
+      data,
+      editingKey: '',
+      visible: true,
+      dataname: 'All',
+    };
     this.columns = [
       {
         title: 'name',
@@ -123,13 +128,20 @@ class EditableTable extends Component {
     });
 
     return (
-      <Table
-        components={components}
-        bordered
-        dataSource={this.state.data}
-        columns={columns}
-        rowClassName="editable-row"
-      />
+      <Modal
+        title={this.state.dataname}
+        footer={null}
+        visible={this.state.visible}
+        onCancel={() => { this.setState({ visible: false }) }}
+      >
+        <Table
+          components={components}
+          bordered
+          dataSource={this.state.data}
+          columns={columns}
+          rowClassName="editable-row"
+        />
+      </Modal>
     );
   }
 }

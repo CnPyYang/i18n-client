@@ -32,6 +32,7 @@ class Menus extends Component {
   }
 
   componentWillMount() {
+    console.log(this)
     Cookies.get(COOKIE_USER_NAME, ({ value }) => {
       this.setState({
         userName: value,
@@ -52,6 +53,13 @@ class Menus extends Component {
     });
   }
 
+  alltranslate() {
+    console.log(this);
+    const action = 'all';
+    const data = true;
+    sendMess(action, data, () => {});
+  }
+
   render() {
     return (
       <div style={{ width: 256 }}>
@@ -66,7 +74,7 @@ class Menus extends Component {
           </Menu.Item>
           <SubMenu key="sub1" title={<span><Icon type="mail" /><span>页面管理</span></span>}>
             <Menu.Item key="2" onClick={this.onetranslate}>单个翻译</Menu.Item>
-            <Menu.Item key="3" onClick={this.componentWillMount}>全部翻译</Menu.Item>
+            <Menu.Item key="3" onClick={this.alltranslate}>全部翻译</Menu.Item>
           </SubMenu>
         </Menu>
       </div>

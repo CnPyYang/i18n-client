@@ -12,7 +12,29 @@ const injectRootDom = () => {
   const div = document.createElement('div');
   div.setAttribute('id', 'chrome-content-root');
   document.body.appendChild(div);
+  console.log(language)
   ReactDOM.render(<App language={language} />, document.getElementById('chrome-content-root'));
+}
+
+const AllInjectDom = () => {
+  const tmp = document.getElementById('chrome-content');
+  if (tmp) {
+    ReactDOM.unmountComponentAtNode(document.getElementById('chrome-content'));
+    tmp.remove();
+  }
+  const data = {
+    url: window.location.protocol + window.location.hostname + window.location.pathname,
+  };
+  Request.get({
+    url: '/i18n/list',
+    data,
+    done: (val) => {
+      const div = document.createElement('div');
+      div.setAttribute('id', 'chrome-content');
+      document.body.appendChild(div);
+      ReactDOM.render(<EditableTable data={val} />, document.getElementById('chrome-content'));
+    },
+  });
 }
 
 const sendMessage = (action, data, url, callback = () => {}) => {
@@ -43,7 +65,7 @@ const contentjs = {
     console.log(action, data)
     switch (action) {
       case 'one': this.oneTrans(data); break;
-      case 'all': ReactDOM.render(<EditableTable />, document.getElementById('chrome-content-root')); break;
+      case 'all': AllInjectDom(); break;
       default: break;
     }
   },

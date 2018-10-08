@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import { Form, Input, Button, Modal } from 'antd';
 
 import Request from '../../commons/utils/request';
-// import Cookies from '../../commons/utils/cookies';
-// import constants from '../../commons/constants';
-// import config from '../../commons/config';
+
 import './App.less';
 
 const FormItem = Form.Item;
@@ -16,6 +14,7 @@ function hasErrors(fieldsError) {
 class App extends Component {
   constructor(props) {
     super(props);
+    console.log(props)
     this.state = {
       errMsg: '',
       visible: false,
@@ -38,8 +37,8 @@ class App extends Component {
       tmp.setAttribute('data-name', tmpdata.dataname);
       tmp.onclick = (ev) => {
         const { dataset } = ev.currentTarget;
-        console.log(this, dataset);
         if (dataset.type && dataset.name) {
+          this.getData(dataset.type);
           this.setState({
             datatype: dataset.type,
             dataname: dataset.name,
@@ -54,6 +53,21 @@ class App extends Component {
 
   componentDidMount() {
     this.props.form.validateFields();
+  }
+
+  getData(datatype) {
+    console.log(this);
+    const data = {
+      url: window.location.protocol + window.location.hostname + window.location.pathname,
+      key: datatype,
+    };
+    Request.get({
+      url: '/i18n/item',
+      data,
+      done: (val) => {
+        console.log(val);
+      },
+    });
   }
 
   getFields() {
@@ -113,12 +127,11 @@ class App extends Component {
 
     return (
       <Modal
-        title="Title"
+        title={this.state.dataname}
         footer={null}
         visible={visible}
         onCancel={() => { this.setState({ visible: false }) }}
       >
-        <Input addonBefore="要翻译的内容:" placeholder={this.state.dataname} disabled />
         <Form onSubmit={e => this.handleSubmit(e)} className="login-form">
           {this.getFields()}
           <FormItem>

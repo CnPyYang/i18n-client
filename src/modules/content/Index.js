@@ -1,45 +1,42 @@
 import React, { Component } from 'react';
 import { Table, Button, Modal } from 'antd';
 
-import { EditableCell, EditableFormRow } from './Table';
+import { EditableCell, EditableFormRow, EditableContext } from './Table';
 
-const EditableContext = React.createContext();
-const data = [];
-for (let i = 0; i < 3; i += 1) {
-  data.push({
-    key: i.toString(),
-    name: `Edrward ${i}`,
-    age: 3,
-    address: `London Park no. ${i}`,
-  });
-}
+// const EditableContext = React.createContext();
 
 class EditableTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data,
+      data: props.data,
       editingKey: '',
       visible: true,
-      dataname: 'All',
+      dataname: '页面国际化',
     };
     this.columns = [
       {
         title: 'name',
         dataIndex: 'name',
         width: '25%',
-        editable: true,
+        editable: false,
       },
       {
-        title: 'age',
-        dataIndex: 'age',
+        title: 'en',
+        dataIndex: '1',
         width: '15%',
         editable: true,
       },
       {
-        title: 'address',
-        dataIndex: 'address',
-        width: '40%',
+        title: 'ZH-CN',
+        dataIndex: '2',
+        width: '15%',
+        editable: true,
+      },
+      {
+        title: 'ZH-HK',
+        dataIndex: '3',
+        width: '15%',
         editable: true,
       },
       {
@@ -52,13 +49,10 @@ class EditableTable extends Component {
               {editable ? (
                 <span>
                   <EditableContext.Consumer>
-                    {form => (
-                      <Button onClick={() => this.save(form, record.key)}>Save</Button>
+                    { row => (
+                      <Button onClick={() => this.save(row, record.key)}>Save</Button>
                     )}
                   </EditableContext.Consumer>
-                  {/* <EditableContext.Consumer>
-                    {<Button onClick={() => this.cancel(record.key)}>Cancel</Button>}
-                  </EditableContext.Consumer> */}
                 </span>
               ) : (
                 <Button onClick={() => this.edit(record.key)}>Edit</Button>
@@ -79,6 +73,7 @@ class EditableTable extends Component {
   }
 
   save(form, key) {
+    console.log(this.props.form, key)
     form.validateFields((error, row) => {
       if (error) {
         return;
@@ -97,10 +92,6 @@ class EditableTable extends Component {
         this.setState({ data: newData, editingKey: '' });
       }
     });
-  }
-
-  cancel() {
-    this.setState({ editingKey: '' });
   }
 
   render() {
@@ -132,6 +123,7 @@ class EditableTable extends Component {
         title={this.state.dataname}
         footer={null}
         visible={this.state.visible}
+        width="80%"
         onCancel={() => { this.setState({ visible: false }) }}
       >
         <Table

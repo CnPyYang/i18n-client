@@ -6,14 +6,26 @@ import App from './App';
 import EditableTable from './Index';
 
 let language = [];
+const allNational = [];
 const { COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME } = constants;
 
 const injectRootDom = () => {
   const div = document.createElement('div');
   div.setAttribute('id', 'chrome-content-root');
   document.body.appendChild(div);
-  console.log(language)
   ReactDOM.render(<App language={language} />, document.getElementById('chrome-content-root'));
+  const tmpDiv = document.querySelectorAll('[data-national]');
+  for (let index = 0; index < tmpDiv.length; index += 1) {
+    const allDiv = {
+      name: tmpDiv[index].dataset.national,
+      htmlName: tmpDiv[index].innerText,
+      key: index.toString(),
+    };
+    language.forEach((item) => {
+      allDiv[item.id] = '';
+    })
+    allNational.push(allDiv);
+  }
 }
 
 const AllInjectDom = () => {
@@ -29,10 +41,26 @@ const AllInjectDom = () => {
     url: '/i18n/list',
     data,
     done: (val) => {
+      // console.log(val)
+      // console.log(language)
+      // console.log(allNational)
+      for (let i = 0; i < allNational.length; i += 1) {
+        const item = allNational[i];
+        val.forEach((e) => {
+          if (item.name === e.key) {
+            const el = Object.keys(item);
+            el.forEach((a) => {
+              if (a === e.lang_id.toString()) {
+                item[a] = e.value;
+              }
+            })
+          }
+        })
+      }
       const div = document.createElement('div');
       div.setAttribute('id', 'chrome-content');
       document.body.appendChild(div);
-      ReactDOM.render(<EditableTable data={val} />, document.getElementById('chrome-content'));
+      ReactDOM.render(<EditableTable data={allNational} language={language} />, document.getElementById('chrome-content'));
     },
   });
 }

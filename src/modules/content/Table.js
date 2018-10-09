@@ -55,4 +55,5 @@ class EditableCell extends Component {
 export {
   EditableCell,
   EditableFormRow,
+  EditableContext,
 };

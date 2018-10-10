@@ -16,52 +16,42 @@ class EditableTable extends Component {
     };
     this.columns = [
       {
-        title: 'name',
-        dataIndex: 'name',
+        title: '字段',
+        dataIndex: 'htmlName',
         width: '25%',
         editable: false,
       },
-      {
-        title: 'en',
-        dataIndex: '1',
-        width: '15%',
-        editable: true,
-      },
-      {
-        title: 'ZH-CN',
-        dataIndex: '2',
-        width: '15%',
-        editable: true,
-      },
-      {
-        title: 'ZH-HK',
-        dataIndex: '3',
-        width: '15%',
-        editable: true,
-      },
-      {
-        title: 'operation',
-        dataIndex: 'operation',
-        render: (text, record) => {
-          const editable = this.isEditing(record);
-          return (
-            <div>
-              {editable ? (
-                <span>
-                  <EditableContext.Consumer>
-                    { row => (
-                      <Button onClick={() => this.save(row, record.key)}>Save</Button>
-                    )}
-                  </EditableContext.Consumer>
-                </span>
-              ) : (
-                <Button onClick={() => this.edit(record.key)}>Edit</Button>
-              )}
-            </div>
-          );
-        },
-      },
     ];
+    props.language.forEach((item) => {
+      this.columns.push({
+        title: item.name,
+        dataIndex: item.id.toString(),
+        width: '15%',
+        editable: true,
+      })
+    })
+    this.columns.push({
+      title: '操作',
+      dataIndex: 'operation',
+      render: (text, record) => {
+        const editable = this.isEditing(record);
+        return (
+          <div>
+            {editable ? (
+              <span>
+                <EditableContext.Consumer>
+                  {form => (
+                    <Button onClick={() => this.save(form, record.key)}>保存</Button>
+                  )}
+                </EditableContext.Consumer>
+              </span>
+            ) : (
+              <Button onClick={() => this.edit(record.key)}>编辑</Button>
+            )}
+          </div>
+        );
+      },
+    })
   }
 
   isEditing(record) {
@@ -73,11 +63,11 @@ class EditableTable extends Component {
   }
 
   save(form, key) {
-    console.log(this.props.form, key)
     form.validateFields((error, row) => {
       if (error) {
         return;
       }
+      console.log(row)
       const newData = [...this.state.data];
       const index = newData.findIndex(item => key === item.key);
       if (index > -1) {
@@ -92,6 +82,10 @@ class EditableTable extends Component {
         this.setState({ data: newData, editingKey: '' });
       }
     });
+  }
+
+  submit() {
+    console.log(this);
   }
 
   render() {
@@ -123,7 +117,7 @@ class EditableTable extends Component {
         title={this.state.dataname}
         footer={null}
         visible={this.state.visible}
-        width="80%"
+        width="60%"
         onCancel={() => { this.setState({ visible: false }) }}
       >
         <Table
@@ -133,6 +127,7 @@ class EditableTable extends Component {
           columns={columns}
           rowClassName="editable-row"
         />
+        <Button onClick={this.submit(this)}>提交</Button>
       </Modal>
     );
   }

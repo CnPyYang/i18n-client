@@ -14,11 +14,22 @@ function hasErrors(fieldsError) {
 class App extends Component {
   constructor(props) {
     super(props);
+    const data = [];
+    for (let i = 0; i < props.language.length; i += 1) {
+      const tmp = this.props.language[i];
+      data.push({
+        name: tmp.name,
+        lang_id: tmp.id,
+        lang_name: tmp.key,
+        value: '',
+      });
+    }
     this.state = {
       errMsg: '',
       visible: false,
       datatype: '',
       dataname: '',
+      data,
     };
   }
 
@@ -55,7 +66,6 @@ class App extends Component {
   }
 
   getData(datatype) {
-    console.log(this);
     const data = {
       url: window.location.protocol + window.location.hostname + window.location.pathname,
       key: datatype,
@@ -64,7 +74,18 @@ class App extends Component {
       url: '/i18n/item',
       data,
       done: (val) => {
-        console.log(val);
+        const tmpdata = [];
+        for (let i = 0; i < this.state.data.length; i += 1) {
+          const tmp = this.state.data[i];
+          tmp.value = '';
+          val.forEach((item) => {
+            if (tmp.lang_id === item.lang_id) {
+              tmp.value = item.value;
+            }
+          })
+          tmpdata.push(tmp);
+        }
+        this.setState({ data: tmpdata })
       },
     });
   }
@@ -72,13 +93,13 @@ class App extends Component {
   getFields() {
     const { getFieldDecorator } = this.props.form;
     const children = [];
-    for (let i = 0; i < this.props.language.length; i += 1) {
-      const tmp = this.props.language[i];
+    for (let i = 0; i < this.state.data.length; i += 1) {
+      const tmp = this.state.data[i];
       children.push(
-        <FormItem label={`${tmp.name}`} key={i}>
-          {getFieldDecorator(`${tmp.id}`)(
-            <Input placeholder={tmp.key} />,
-          )}
+        <FormItem style={{ margin: 0 }} label={`${tmp.name}`} key={i}>
+          {getFieldDecorator(`${tmp.lang_id}`, {
+            initialValue: tmp.value,
+          })(<Input placeholder={tmp.lang_name} />)}
         </FormItem>,
       );
     }
@@ -94,6 +115,7 @@ class App extends Component {
         return;
       }
       const tmpvalues = Object.entries(values);
+      console.log(tmpvalues)
       const postdata = [];
       for (let i = 0; i < tmpvalues.length; i += 1) {
         const tmp = tmpvalues[i];

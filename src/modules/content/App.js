@@ -115,7 +115,6 @@ class App extends Component {
         return;
       }
       const tmpvalues = Object.entries(values);
-      console.log(tmpvalues)
       const postdata = [];
       for (let i = 0; i < tmpvalues.length; i += 1) {
         const tmp = tmpvalues[i];

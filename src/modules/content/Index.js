@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import { Table, Button, Modal } from 'antd';
+import { Table, Modal, Button } from 'antd';
 
-import { EditableCell, EditableFormRow, EditableContext } from './Table';
-
-// const EditableContext = React.createContext();
+import { EditableCell, EditableFormRow } from './Table';
+import Request from '../../commons/utils/request';
 
 class EditableTable extends Component {
   constructor(props) {
     super(props);
+    console.log(props)
     this.state = {
-      data: props.data,
-      editingKey: '',
+      dataSource: props.data,
       visible: true,
       dataname: '页面国际化',
     };
@@ -18,7 +17,7 @@ class EditableTable extends Component {
       {
         title: '字段',
         dataIndex: 'htmlName',
-        width: '25%',
+        width: '10%',
         editable: false,
       },
     ];
@@ -26,66 +25,49 @@ class EditableTable extends Component {
       this.columns.push({
         title: item.name,
         dataIndex: item.id.toString(),
-        width: '15%',
         editable: true,
+        width: '15%',
       })
     })
-    this.columns.push({
-      title: '操作',
-      dataIndex: 'operation',
-      render: (text, record) => {
-        const editable = this.isEditing(record);
-        return (
-          <div>
-            {editable ? (
-              <span>
-                <EditableContext.Consumer>
-                  {form => (
-                    <Button onClick={() => this.save(form, record.key)}>保存</Button>
-                  )}
-                </EditableContext.Consumer>
-              </span>
-            ) : (
-              <Button onClick={() => this.edit(record.key)}>编辑</Button>
-            )}
-          </div>
-        );
-      },
-    })
+    this.handleSave = this.handleSave.bind(this)
+    this.submit = this.submit.bind(this)
   }
 
-  isEditing(record) {
-    return record.key === this.state.editingKey;
-  }
-
-  edit(key) {
-    this.setState({ editingKey: key });
-  }
-
-  save(form, key) {
-    form.validateFields((error, row) => {
-      if (error) {
-        return;
-      }
-      console.log(row)
-      const newData = [...this.state.data];
-      const index = newData.findIndex(item => key === item.key);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        this.setState({ data: newData, editingKey: '' });
-      } else {
-        newData.push(row);
-        this.setState({ data: newData, editingKey: '' });
-      }
+  handleSave(row) {
+    const newData = this.state.dataSource;// eslint-disable-line
+    const index = newData.findIndex(item => row.key === item.key);
+    const item = newData[index];
+    newData.splice(index, 1, {
+      ...item,
+      ...row,
     });
+    this.setState({ dataSource: newData });
   }
 
   submit() {
-    console.log(this);
+    const postdata = [];
+    this.state.dataSource.forEach((item) => {
+      const tmpvalues = Object.entries(item);
+      for (let i = 0; i < tmpvalues.length - 3; i += 1) {
+        const tmp = tmpvalues[i];
+        const tmpdata = {
+          url: window.location.protocol + window.location.hostname + window.location.pathname,
+          key: item.name,
+          lang_id: Number(tmp[0]),
+          value: tmp[1],
+        };
+        postdata.push(tmpdata);
+      }
+    })
+    Request.post({
+      url: '/i18n/save',
+      data: { data: postdata },
+      done: (value) => {
+        if (!value.errCode) {
+          this.setState({ visible: false });
+        }
+      },
+    });
   }
 
   render() {
@@ -104,10 +86,10 @@ class EditableTable extends Component {
         ...col,
         onCell: record => ({
           record,
-          inputType: col.dataIndex === 'age' ? 'number' : 'text',
+          editable: col.editable,
           dataIndex: col.dataIndex,
           title: col.title,
-          editing: this.isEditing(record),
+          handleSave: this.handleSave,
         }),
       };
     });
@@ -123,11 +105,11 @@ class EditableTable extends Component {
         <Table
           components={components}
           bordered
-          dataSource={this.state.data}
+          dataSource={this.state.dataSource}
           columns={columns}
           rowClassName="editable-row"
         />
-        <Button onClick={this.submit(this)}>提交</Button>
+        <Button onClick={this.submit}>提交</Button>
       </Modal>
     );
   }

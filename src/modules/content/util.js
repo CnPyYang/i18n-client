@@ -90,7 +90,6 @@ const contentjs = {
     }
   },
   listenPopup({ action, data }, sender, response) { // eslint-disable-line
-    console.log(action, data)
     switch (action) {
       case 'one': this.oneTrans(data); break;
       case 'all': AllInjectDom(); break;

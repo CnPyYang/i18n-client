@@ -14,22 +14,13 @@ function hasErrors(fieldsError) {
 class App extends Component {
   constructor(props) {
     super(props);
-    const data = [];
-    for (let i = 0; i < props.language.length; i += 1) {
-      const tmp = this.props.language[i];
-      data.push({
-        name: tmp.name,
-        lang_id: tmp.id,
-        lang_name: tmp.key,
-        value: '',
-      });
-    }
     this.state = {
       errMsg: '',
       visible: false,
       datatype: '',
       dataname: '',
-      data,
+      data: props.data,
+      isUpdate: false,
     };
   }
 
@@ -52,7 +43,6 @@ class App extends Component {
           this.setState({
             datatype: dataset.type,
             dataname: dataset.name,
-            visible: true,
           })
         }
       };
@@ -75,17 +65,19 @@ class App extends Component {
       data,
       done: (val) => {
         const tmpdata = [];
+        if (val.length > 0) this.setState({ isUpdate: true })
         for (let i = 0; i < this.state.data.length; i += 1) {
           const tmp = this.state.data[i];
           tmp.value = '';
           val.forEach((item) => {
             if (tmp.lang_id === item.lang_id) {
               tmp.value = item.value;
+              tmp.id = item.id;
             }
           })
           tmpdata.push(tmp);
         }
-        this.setState({ data: tmpdata })
+        this.setState({ data: tmpdata, visible: true })
       },
     });
   }
@@ -115,20 +107,29 @@ class App extends Component {
         return;
       }
       const tmpvalues = Object.entries(values);
-      const postdata = [];
+      const url = window.location.protocol + window.location.hostname + window.location.pathname;
+      const data = [];
       for (let i = 0; i < tmpvalues.length; i += 1) {
         const tmp = tmpvalues[i];
         const tmpdata = {
-          url: window.location.protocol + window.location.hostname + window.location.pathname,
           key: this.state.datatype,
           lang_id: Number(tmp[0]),
           value: tmp[1],
         };
-        postdata.push(tmpdata);
+        if (this.state.isUpdate) {
+          this.state.data.forEach((item) => {
+            if (tmpdata.lang_id === item.lang_id) {
+              tmpdata.id = item.id;
+            }
+          })
+        }
+        data.push(tmpdata);
       }
+      let postUrl = '/i18n/save';
+      if (this.state.isUpdate) postUrl = '/i18n/update'
       Request.post({
-        url: '/i18n/save',
-        data: { data: postdata },
+        url: postUrl,
+        data: { data, url },
         done: (value) => {
           if (value.errCode) {
             this.setState({ errMsg: value.errMsg });

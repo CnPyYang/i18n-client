@@ -45,29 +45,58 @@ class EditableTable extends Component {
   }
 
   submit() {
-    const postdata = [];
+    const data = [];
+    const url = window.location.protocol + window.location.hostname + window.location.pathname;
     this.state.dataSource.forEach((item) => {
       const tmpvalues = Object.entries(item);
       for (let i = 0; i < tmpvalues.length - 3; i += 1) {
         const tmp = tmpvalues[i];
         const tmpdata = {
-          url: window.location.protocol + window.location.hostname + window.location.pathname,
           key: item.name,
           lang_id: Number(tmp[0]),
           value: tmp[1],
         };
-        postdata.push(tmpdata);
+        this.props.val.forEach((e) => {
+          if (tmpdata.lang_id === e.lang_id && item.name === e.key) {
+            tmpdata.id = e.id;
+          }
+        })
+        data.push(tmpdata);
       }
     })
-    Request.post({
-      url: '/i18n/save',
-      data: { data: postdata },
-      done: (value) => {
-        if (!value.errCode) {
+    const iddata = data.filter(val => val.id);
+    const noiddata = data.filter(val => !val.id);
+    // Request.post({
+    //   url: '/i18n/update',
+    //   data: { data: iddata, url },
+    //   done: () => {
+    //     this.setState({ visible: false });
+    //   },
+    // });
+    // Request.post({
+    //   url: '/i18n/save',
+    //   data: { data: noiddata, url },
+    //   done: () => {
+    //     this.setState({ visible: false });
+    //   },
+    // });
+    if (noiddata.length > 0) {
+      Promise.all([
+        Request.post({ url: '/i18n/save', data: { data: noiddata, url } }),
+        Request.post({ url: '/i18n/update', data: { data: iddata, url } }),
+      ]).then((val) => {
+        console.log(val)
+        this.setState({ visible: false });
+      })
+    } else {
+      Request.post({
+        url: '/i18n/update',
+        data: { data: iddata, url },
+        done: () => {
           this.setState({ visible: false });
-        }
-      },
-    });
+        },
+      });
+    }
   }
 
   render() {

@@ -38,10 +38,11 @@ class EditableCell extends Component {
   }
 
   toggleEdit() {
+    console.log(this)
     const editing = !this.state.editing;// eslint-disable-line
     this.setState({ editing }, () => {
       if (editing) {
-        this.input.focus();
+        this.textarea.focus();
       }
     });
   }
@@ -69,7 +70,7 @@ class EditableCell extends Component {
   }
 
   editInput(node) {
-    this.input = node;
+    this.textarea = node;
   }
 
   render() {
@@ -95,9 +96,14 @@ class EditableCell extends Component {
                     {form.getFieldDecorator(dataIndex, {
                       initialValue: record[dataIndex],
                     })(
-                      <Input
+                      // <Input
+                      //   ref={this.editInput}
+                      //   onPressEnter={this.save}
+                      // />,
+                      <Input.TextArea
                         ref={this.editInput}
                         onPressEnter={this.save}
+                        autosize={{ minRows: 2 }}
                       />,
                     )}
                   </FormItem>

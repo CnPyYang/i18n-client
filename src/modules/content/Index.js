@@ -4,10 +4,11 @@ import { Table, Modal, Button } from 'antd';
 import { EditableCell, EditableFormRow } from './Table';
 import Request from '../../commons/utils/request';
 
+import './Index.less';
+
 class EditableTable extends Component {
   constructor(props) {
     super(props);
-    console.log(props)
     this.state = {
       dataSource: props.data,
       visible: true,
@@ -17,7 +18,7 @@ class EditableTable extends Component {
       {
         title: '字段',
         dataIndex: 'htmlName',
-        width: '10%',
+        width: `${(100 / (props.language.length + 1))}%`,
         editable: false,
       },
     ];
@@ -26,7 +27,7 @@ class EditableTable extends Component {
         title: item.name,
         dataIndex: item.id.toString(),
         editable: true,
-        width: '15%',
+        width: `${(100 / (props.language.length + 1))}%`,
       })
     })
     this.handleSave = this.handleSave.bind(this)
@@ -66,26 +67,11 @@ class EditableTable extends Component {
     })
     const iddata = data.filter(val => val.id);
     const noiddata = data.filter(val => !val.id);
-    // Request.post({
-    //   url: '/i18n/update',
-    //   data: { data: iddata, url },
-    //   done: () => {
-    //     this.setState({ visible: false });
-    //   },
-    // });
-    // Request.post({
-    //   url: '/i18n/save',
-    //   data: { data: noiddata, url },
-    //   done: () => {
-    //     this.setState({ visible: false });
-    //   },
-    // });
     if (noiddata.length > 0) {
       Promise.all([
         Request.post({ url: '/i18n/save', data: { data: noiddata, url } }),
         Request.post({ url: '/i18n/update', data: { data: iddata, url } }),
-      ]).then((val) => {
-        console.log(val)
+      ]).then(() => {
         this.setState({ visible: false });
       })
     } else {
@@ -138,7 +124,9 @@ class EditableTable extends Component {
           columns={columns}
           rowClassName="editable-row"
         />
-        <Button onClick={this.submit}>提交</Button>
+        <div className="ant-btn-right">
+          <Button className="login-form-button" type="primary" onClick={this.submit}>提交</Button>
+        </div>
       </Modal>
     );
   }

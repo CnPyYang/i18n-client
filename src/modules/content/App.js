@@ -151,13 +151,14 @@ class App extends Component {
         title={this.state.dataname}
         footer={null}
         visible={visible}
+        width="50%"
         onCancel={() => { this.setState({ visible: false }) }}
       >
         <Form onSubmit={e => this.handleSubmit(e)} className="login-form">
           {this.getFields()}
           <FormItem>
             <Button className="login-form-button" type="primary" htmlType="submit" disabled={hasErrors(getFieldsError())}>
-              submit
+              提交
             </Button>
             { errTpl }
           </FormItem>

@@ -4,6 +4,7 @@ import Request from '../../commons/utils/request';
 import constants from '../../commons/constants';
 import App from './App';
 import EditableTable from './Index';
+import Err from './Err';
 
 let language = [];
 const allNational = [];
@@ -121,10 +122,14 @@ const getRootDom = () => {
   Request.get({
     url: '/i18n/languages',
     done: (data) => {
-      language = data.languages;
       if (data.errCode === 2001) {
         sendMessage('user_token', [COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME], window.location.href);
+        const div = document.createElement('div');
+        div.setAttribute('id', 'chrome-err');
+        document.body.appendChild(div);
+        ReactDOM.render(<Err err={data.errMsg} />, document.getElementById('chrome-err'));
       } else if (!data.errCode) {
+        language = data.languages;
         injectRootDom();
       }
     },

@@ -60,6 +60,13 @@ class Menus extends Component {
     sendMess(action, data, () => {});
   }
 
+  menegelang() {
+    console.log(this);
+    const action = 'language';
+    const data = true;
+    sendMess(action, data, () => {});
+  }
+
   render() {
     return (
       <div style={{ width: 256 }}>
@@ -72,9 +79,10 @@ class Menus extends Component {
             <Icon type="pie-chart" />
             <span>{ this.state.userName }</span>
           </Menu.Item>
-          <SubMenu key="sub1" title={<span><Icon type="mail" /><span>页面管理</span></span>}>
+          <SubMenu key="sub1" title={<span><Icon type="mail" /><span>管理</span></span>}>
             <Menu.Item key="2" onClick={this.onetranslate}>单个翻译</Menu.Item>
             <Menu.Item key="3" onClick={this.alltranslate}>全部翻译</Menu.Item>
+            <Menu.Item key="4" onClick={this.menegelang}>语言管理</Menu.Item>
           </SubMenu>
         </Menu>
       </div>

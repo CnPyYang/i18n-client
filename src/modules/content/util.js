@@ -5,40 +5,96 @@ import constants from '../../commons/constants';
 import App from './App';
 import EditableTable from './Index';
 import Err from './Err';
+import Language from './Lang';
 
 let language = [];
 const allNational = [];
 const { COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME } = constants;
 
+// 单个翻译
 const injectRootDom = () => {
-  const data = [];
-  for (let i = 0; i < language.length; i += 1) {
-    const tmp = language[i];
-    data.push({
-      name: tmp.name,
-      lang_id: tmp.id,
-      lang_name: tmp.key,
-      value: '',
-    });
-  }
-  const div = document.createElement('div');
-  div.setAttribute('id', 'chrome-content-root');
-  document.body.appendChild(div);
-  ReactDOM.render(<App data={data} />, document.getElementById('chrome-content-root'));
-  const tmpDiv = document.querySelectorAll('[data-national]');
-  for (let index = 0; index < tmpDiv.length; index += 1) {
-    const allDiv = {
-      name: tmpDiv[index].dataset.national,
-      htmlName: tmpDiv[index].innerText,
-      key: index.toString(),
-    };
-    language.forEach((item) => {
-      allDiv[item.id] = '';
-    })
-    allNational.push(allDiv);
-  }
-}
+  const postdata = {
+    hostname: window.location.hostname,
+  };
+  // 获取本站点的语言
+  Request.get({
+    url: '/urlang/list',
+    data: postdata,
+    done: (val) => {
+      const data = [];
+      for (let index = 0; index < val.data.length; index += 1) {
+        const ele = val.data[index];
+        language.forEach((e) => {
+          if (ele.lang_id === e.id) {
+            data.push({
+              name: e.name,
+              lang_name: e.key,
+              lang_id: ele.lang_id,
+              url_lang_id: ele.id,
+              value: '',
+            })
+            return false;
+          }
+          return true;
+        })
+      }
+      data.sort((val1, val2) => val1.lang_id - val2.lang_id); // 本页语言按lang_id排序
+      sessionStorage.setItem('pagedata', JSON.stringify(data));// 本站点的语言类型存到本地
 
+      const div = document.createElement('div');
+      div.setAttribute('id', 'chrome-content-root');
+      document.body.appendChild(div);
+      ReactDOM.render(<App />, document.getElementById('chrome-content-root'));
+
+      const tmpDiv = document.querySelectorAll('[data-national]');// 全部翻译所需要的数据
+      for (let index = 0; index < tmpDiv.length; index += 1) {
+        const boo = allNational.some(ele => ele.name === tmpDiv[index].dataset.national);
+        if (!boo) {
+          const allDiv = {
+            name: tmpDiv[index].dataset.national,
+            key: index.toString(),
+          };
+          data.forEach((item) => {
+            allDiv[item.url_lang_id] = '';
+          })
+          allNational.push(allDiv);
+        }
+      }
+    },
+  })
+}
+// 管理语言
+const menegeLang = () => {
+  const tmp = document.getElementById('chrome-content-lang');
+  if (tmp) {
+    ReactDOM.unmountComponentAtNode(document.getElementById('chrome-content-lang'));
+    tmp.remove();
+  }
+  const data = {
+    hostname: window.location.hostname,
+  };
+  Request.get({
+    url: '/urlang/list',
+    data,
+    done: (val) => {
+      for (let index = 0; index < val.data.length; index += 1) {
+        const ele = val.data[index];
+        language.forEach((e) => {
+          if (ele.lang_id === e.id) {
+            ele.name = e.name;
+            return false;
+          }
+          return true;
+        })
+      }
+      const div = document.createElement('div');
+      div.setAttribute('id', 'chrome-content-lang');
+      document.body.appendChild(div);
+      ReactDOM.render(<Language allLang={language} theLang={val.data} />, document.getElementById('chrome-content-lang'));
+    },
+  });
+}
+// 全部翻译
 const AllInjectDom = () => {
   const tmp = document.getElementById('chrome-content');
   if (tmp) {
@@ -46,29 +102,33 @@ const AllInjectDom = () => {
     tmp.remove();
   }
   const data = {
-    url: window.location.protocol + window.location.hostname + window.location.pathname,
+    hostname: window.location.hostname,
+    pathname: window.location.pathname,
   };
   Request.get({
-    url: '/i18n/list',
+    url: '/kv/list',
     data,
-    done: (val) => {
+    done: (ele) => {
+      const val = ele.data;
       for (let i = 0; i < allNational.length; i += 1) {
         const item = allNational[i];
         val.forEach((e) => {
           if (item.name === e.key) {
             const el = Object.keys(item);
             el.forEach((a) => {
-              if (a === e.lang_id.toString()) {
+              if (a === e.url_lang_id.toString()) {
                 item[a] = e.value;
               }
             })
           }
         })
       }
+      sessionStorage.setItem('showdata', JSON.stringify(allNational))
+      sessionStorage.setItem('rawdata', JSON.stringify(val))
       const div = document.createElement('div');
       div.setAttribute('id', 'chrome-content');
       document.body.appendChild(div);
-      ReactDOM.render(<EditableTable data={allNational} val={val} language={language} />, document.getElementById('chrome-content'));
+      ReactDOM.render(<EditableTable />, document.getElementById('chrome-content'));
     },
   });
 }
@@ -101,6 +161,7 @@ const contentjs = {
     switch (action) {
       case 'one': this.oneTrans(data); break;
       case 'all': AllInjectDom(); break;
+      case 'language': menegeLang(); break;
       default: break;
     }
   },
@@ -120,7 +181,7 @@ contentjs.listenerCount();
 
 const getRootDom = () => {
   Request.get({
-    url: '/i18n/languages',
+    url: '/languages',
     done: (data) => {
       if (data.errCode === 2001) {
         sendMessage('user_token', [COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME], window.location.href);
@@ -130,6 +191,7 @@ const getRootDom = () => {
         ReactDOM.render(<Err err={data.errMsg} />, document.getElementById('chrome-err'));
       } else if (!data.errCode) {
         language = data.languages;
+        sessionStorage.setItem('language', JSON.stringify(language))
         injectRootDom();
       }
     },
@@ -140,3 +202,4 @@ export {
   getRootDom,
   sendMessage,
 };
+// showdata 全部翻译数据展示的数据 rawdata 全部翻译数据原始的数据 pagedata 本页面要翻译的语言  language 所有语言的种类

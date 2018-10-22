@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Table, Modal, Button } from 'antd';
 
-import Textarea from './Textarea'
-import Request from '../../commons/utils/request';
+import { EditableCell, EditableFormRow } from './Table';
+import Request from '../../../commons/utils/request';
 
 class EditableTable extends Component {
   constructor() {
     super();
+    console.log(JSON.parse(sessionStorage.getItem('showdata')))
     this.state = {
       dataSource: JSON.parse(sessionStorage.getItem('showdata')),
       visible: true,
@@ -17,9 +18,8 @@ class EditableTable extends Component {
       {
         title: '字段',
         dataIndex: 'name',
-        width: 100,
+        width: `${(100 / (this.state.pagedata.length + 2))}%`,
         editable: false,
-        // fixed: 'left',
       },
     ];
     this.state.pagedata.forEach((item) => {
@@ -27,71 +27,36 @@ class EditableTable extends Component {
         title: item.name,
         dataIndex: item.url_lang_id.toString(),
         editable: true,
-        width: 200,
+        width: `${(100 / (this.state.pagedata.length + 2))}%`,
       })
     })
     this.columns.push({
       title: '编辑',
       dataIndex: 'operation',
-      width: 100,
-      // fixed: 'right',
-      render: (text, record) => <Button onClick={() => this.edit(text, record)}>Edit</Button>,
+      width: `${(100 / (this.state.pagedata.length + 2))}%`,
+      render: record => <div><a href="/#" onClick={() => this.edit(record.key)}>Edit</a></div>,
     })
+    this.handleSave = this.handleSave.bind(this)
     this.submit = this.submit.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
-  edit(datatype, data) { // 编辑按钮弹窗
-    const tmpvalues = Object.entries(data);
-    const postdata = [];
-    for (let i = 0; i < tmpvalues.length; i += 1) {
-      const tmp = tmpvalues[i];
-      if (Number(tmp[0])) {
-        const tmpdata = {
-          name: data.name,
-          url_lang_id: Number(tmp[0]),
-          value: tmp[1],
-        };
-        const rawdata = JSON.parse(sessionStorage.getItem('rawdata'));
-        for (let j = 0; j < rawdata.length; j += 1) {
-          if (tmpdata.url_lang_id === rawdata[j].url_lang_id && data.name === rawdata[j].key) {
-            tmpdata.id = rawdata[j].id;
-            break;
-          }
-        }
-        postdata.push(tmpdata);
-      }
-    }
-    this.formRef.childFun(data.name, postdata, '40%');
+  handleSave(row) {
+    const newData = this.state.dataSource;// eslint-disable-line
+    const index = newData.findIndex(item => row.key === item.key);
+    const item = newData[index];
+    newData.splice(index, 1, {
+      ...item,
+      ...row,
+    });
+    this.setState({ dataSource: newData });
   }
 
-  submit(savedata, updata, callback) {
-    const values = savedata.length === 0 ? updata : savedata;
-    console.log(values)
-    const tmpdata = this.state.dataSource;// eslint-disable-line
-    for (let index = 0; index < tmpdata.length; index += 1) {
-      const val = tmpdata[index];
-      if (val.name === values[0].key) {
-        values.forEach((e) => {
-          Object.keys(val).forEach((a) => {
-            if (a === e.url_lang_id.toString()) {
-              val[a] = e.value;
-            }
-          })
-        })
-        callback();
-        break;
-      }
-    }
-    this.setState({ dataSource: tmpdata })
-  }
-
-  handleSubmit() {
+  submit() {
     const data = [];
     const rawdata = JSON.parse(sessionStorage.getItem('rawdata'));
     this.state.dataSource.forEach((item) => {
       const tmpvalues = Object.entries(item);
-      for (let i = 0; i < tmpvalues.length - 2; i += 1) {
+      for (let i = 0; i < tmpvalues.length - 3; i += 1) {
         const tmp = tmpvalues[i];
         const tmpdata = {
           key: item.name,
@@ -127,6 +92,29 @@ class EditableTable extends Component {
   }
 
   render() {
+    const components = {
+      body: {
+        row: EditableFormRow,
+        cell: EditableCell,
+      },
+    };
+
+    const columns = this.columns.map((col) => {
+      if (!col.editable) {
+        return col;
+      }
+      return {
+        ...col,
+        onCell: record => ({
+          record,
+          editable: col.editable,
+          dataIndex: col.dataIndex,
+          title: col.title,
+          handleSave: this.handleSave,
+        }),
+      };
+    });
+
     return (
       <Modal
         title={this.state.dataname}
@@ -136,15 +124,15 @@ class EditableTable extends Component {
         onCancel={() => { this.setState({ visible: false }) }}
       >
         <Table
+          components={components}
           bordered
           dataSource={this.state.dataSource}
-          columns={this.columns}
+          columns={columns}
           rowClassName="editable-row"
         />
         <div className="ant-btn-right">
-          <Button className="login-form-button" type="primary" onClick={this.handleSubmit}>提交</Button>
+          <Button className="login-form-button" type="primary" onClick={this.submit}>提交</Button>
         </div>
-        <Textarea submit={this.submit} wrappedComponentRef={(e) => { this.formRef = e }} />
       </Modal>
     );
   }

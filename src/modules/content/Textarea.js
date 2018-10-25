@@ -4,6 +4,7 @@ import { Form, Input, Button, Modal } from 'antd';
 import './App.less';
 
 const FormItem = Form.Item;
+const baseSrc = 'https://fanyi.baidu.com/';
 
 class Textarea extends Component {
   constructor(props) {
@@ -14,9 +15,10 @@ class Textarea extends Component {
       datatype: '',
       data: [],
       loading: false,
-      width: '50%',
+      src: baseSrc,
     };
     this.settype = this.settype.bind(this)
+    this.setvalue = this.setvalue.bind(this)
   }
 
   getFields() {
@@ -28,20 +30,27 @@ class Textarea extends Component {
         <FormItem style={{ margin: 0 }} label={`${tmp.name}`} key={i}>
           {getFieldDecorator(`${tmp.url_lang_id}`, {
             initialValue: tmp.value,
-          })(<Input.TextArea rows={3} />)}
+          })(<Input.TextArea rows={3} onBlur={this.setvalue} />)}
         </FormItem>,
       );
     }
     return children;
   }
 
+  setvalue(e) {
+    if (e.target.id === '18') {
+      this.setState({ src: `${baseSrc}#en/zh/${e.target.value}` })
+    } else {
+      this.setState({ src: `${baseSrc}#zh/en/${e.target.value}` })
+    }
+  }
+
   settype() {
     this.setState({ visible: false, loading: false, data: [] })
   }
 
-  childFun(datatype, tmpdata, width) {
-    console.log(tmpdata)
-    this.setState({ visible: true, datatype, data: tmpdata, width })
+  childFun(datatype, tmpdata, src) {
+    this.setState({ visible: true, datatype, data: tmpdata, src: `${baseSrc}#en/zh/${src}` })
   }
 
   handleSubmit(e) {
@@ -86,7 +95,7 @@ class Textarea extends Component {
         title={this.state.datatype}
         footer={null}
         visible={this.state.visible}
-        width={this.state.width}
+        width="80%"
         onCancel={() => { this.setState({ visible: false }) }}
       >
         <Form onSubmit={e => this.handleSubmit(e)} className="login-form">
@@ -98,6 +107,7 @@ class Textarea extends Component {
             { errTpl }
           </FormItem>
         </Form>
+        <iframe src={this.state.src} className="iframe-dispaly" title="translate" />
       </Modal>
     );
   }

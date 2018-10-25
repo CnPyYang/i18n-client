@@ -44,6 +44,7 @@ class EditableTable extends Component {
   edit(datatype, data) { // 编辑按钮弹窗
     const tmpvalues = Object.entries(data);
     const postdata = [];
+    let str = '';
     for (let i = 0; i < tmpvalues.length; i += 1) {
       const tmp = tmpvalues[i];
       if (Number(tmp[0])) {
@@ -53,21 +54,24 @@ class EditableTable extends Component {
           value: tmp[1],
         };
         const rawdata = JSON.parse(sessionStorage.getItem('rawdata'));
+        const pagedata = JSON.parse(sessionStorage.getItem('pagedata'));
         for (let j = 0; j < rawdata.length; j += 1) {
           if (tmpdata.url_lang_id === rawdata[j].url_lang_id && data.name === rawdata[j].key) {
             tmpdata.id = rawdata[j].id;
+            if (pagedata.some(ele => ele.lang_name === 'en-us' && ele.url_lang_id === tmpdata.url_lang_id)) {
+              str = tmpdata.value;
+            }
             break;
           }
         }
         postdata.push(tmpdata);
       }
     }
-    this.formRef.childFun(data.name, postdata, '40%');
+    this.formRef.childFun(data.name, postdata, str);
   }
 
   submit(savedata, updata, callback) {
     const values = savedata.length === 0 ? updata : savedata;
-    console.log(values)
     const tmpdata = this.state.dataSource;// eslint-disable-line
     for (let index = 0; index < tmpdata.length; index += 1) {
       const val = tmpdata[index];

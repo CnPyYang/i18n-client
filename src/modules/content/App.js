@@ -43,26 +43,30 @@ class App extends Component {
     Request.get({
       url: '/kv/item',
       data,
-      done: (ele) => {
-        const val = ele.data;
+      done: (e) => {
+        const val = e.data;
         const tmpdata = [];
+        let str = '';
         const values = JSON.parse(sessionStorage.getItem('pagedata'));
+        const pagedata = JSON.parse(sessionStorage.getItem('pagedata'));
         for (let i = 0; i < values.length; i += 1) {
           const tmp = {
             name: values[i].name,
             url_lang_id: values[i].url_lang_id,
           };
-          if (val.length > 0) {
-            val.forEach((item) => {
-              if (tmp.url_lang_id === item.url_lang_id) {
-                tmp.value = item.value;
-                tmp.id = item.id;
+          for (let index = 0; index < val.length; index += 1) {
+            const item = val[index];
+            if (tmp.url_lang_id === item.url_lang_id) {
+              tmp.value = item.value;
+              tmp.id = item.id;
+              if (pagedata.some(ele => ele.lang_name === 'en-us' && ele.url_lang_id === tmp.url_lang_id)) {
+                str = tmp.value;
               }
-            })
+            }
           }
           tmpdata.push(tmp);
         }
-        this.formRef.childFun(datatype, tmpdata, '50%');
+        this.formRef.childFun(datatype, tmpdata, str);
       },
     });
   }

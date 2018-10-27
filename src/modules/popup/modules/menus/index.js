@@ -67,6 +67,13 @@ class Menus extends Component {
     sendMess(action, data, () => {});
   }
 
+  cdn() {
+    console.log(this);
+    const action = 'cdn';
+    const data = true;
+    sendMess(action, data, () => {});
+  }
+
   render() {
     return (
       <div style={{ width: 256 }}>
@@ -83,6 +90,7 @@ class Menus extends Component {
             <Menu.Item key="2" onClick={this.onetranslate}>单个翻译</Menu.Item>
             <Menu.Item key="3" onClick={this.alltranslate}>全部翻译</Menu.Item>
             <Menu.Item key="4" onClick={this.menegelang}>语言管理</Menu.Item>
+            <Menu.Item key="5" onClick={this.cdn}>CDN配置</Menu.Item>
           </SubMenu>
         </Menu>
       </div>

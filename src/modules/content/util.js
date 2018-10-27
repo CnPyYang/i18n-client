@@ -6,6 +6,7 @@ import App from './App';
 import EditableTable from './Index';
 import Err from './Err';
 import Language from './Lang';
+import Cdn from './Cdn';
 
 let language = [];
 const allNational = [];
@@ -133,6 +134,44 @@ const AllInjectDom = () => {
   });
 }
 
+const menegeCdn = () => {
+  const tmp = document.getElementById('chrome-content-cdn');
+  if (tmp) {
+    ReactDOM.unmountComponentAtNode(document.getElementById('chrome-content-cdn'));
+    tmp.remove();
+  }
+  const data = {
+    hostname: window.location.hostname,
+    pathname: window.location.pathname,
+  };
+  Request.get({
+    url: '/kv/list',
+    data,
+    done: (ele) => {
+      const val = ele.data;
+      for (let i = 0; i < allNational.length; i += 1) {
+        const item = allNational[i];
+        val.forEach((e) => {
+          if (item.name === e.key) {
+            const el = Object.keys(item);
+            el.forEach((a) => {
+              if (a === e.url_lang_id.toString()) {
+                item[a] = e.value;
+              }
+            })
+          }
+        })
+      }
+      sessionStorage.setItem('showdata', JSON.stringify(allNational))
+      sessionStorage.setItem('rawdata', JSON.stringify(val))
+      const div = document.createElement('div');
+      div.setAttribute('id', 'chrome-content-cdn');
+      document.body.appendChild(div);
+      ReactDOM.render(<Cdn />, document.getElementById('chrome-content-cdn'));
+    },
+  });
+}
+
 const sendMessage = (action, data, url, callback = () => {}) => {
   chrome.runtime.sendMessage({ _from: 'content', action, data, url }, (tmp, sender, response) => {
     callback(tmp, sender, response);
@@ -162,6 +201,7 @@ const contentjs = {
       case 'one': this.oneTrans(data); break;
       case 'all': AllInjectDom(); break;
       case 'language': menegeLang(); break;
+      case 'cdn': menegeCdn(); break;
       default: break;
     }
   },

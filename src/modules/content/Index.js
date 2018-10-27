@@ -31,7 +31,7 @@ class EditableTable extends Component {
       })
     })
     this.columns.push({
-      title: '编辑',
+      title: '操作',
       dataIndex: 'operation',
       width: 100,
       // fixed: 'right',

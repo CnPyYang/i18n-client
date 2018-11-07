@@ -17,25 +17,26 @@ class EditableTable extends Component {
       {
         title: '字段',
         dataIndex: 'name',
-        width: 100,
-        editable: false,
-        // fixed: 'left',
+        width: 150,
+        align: 'center',
+        fixed: 'left',
       },
     ];
     this.state.pagedata.forEach((item) => {
       this.columns.push({
-        title: item.name,
+        title: `${item.name}(${item.lang_name})`,
         dataIndex: item.url_lang_id.toString(),
-        editable: true,
+        align: 'center',
         width: 200,
       })
     })
     this.columns.push({
       title: '操作',
       dataIndex: 'operation',
-      width: 100,
-      // fixed: 'right',
-      render: (text, record) => <Button onClick={() => this.edit(text, record)}>Edit</Button>,
+      width: 150,
+      align: 'center',
+      fixed: 'right',
+      render: (text, record) => <Button onClick={() => this.edit(text, record)}>编辑</Button>,
     })
     this.submit = this.submit.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -43,31 +44,33 @@ class EditableTable extends Component {
 
   edit(datatype, data) { // 编辑按钮弹窗
     const tmpvalues = Object.entries(data);
+    const rawdata = JSON.parse(sessionStorage.getItem('rawdata'));
+    const pagedata = JSON.parse(sessionStorage.getItem('pagedata'));
     const postdata = [];
-    let str = '';
     for (let i = 0; i < tmpvalues.length; i += 1) {
       const tmp = tmpvalues[i];
       if (Number(tmp[0])) {
         const tmpdata = {
-          name: data.name,
           url_lang_id: Number(tmp[0]),
           value: tmp[1],
         };
-        const rawdata = JSON.parse(sessionStorage.getItem('rawdata'));
-        const pagedata = JSON.parse(sessionStorage.getItem('pagedata'));
         for (let j = 0; j < rawdata.length; j += 1) {
           if (tmpdata.url_lang_id === rawdata[j].url_lang_id && data.name === rawdata[j].key) {
             tmpdata.id = rawdata[j].id;
-            if (pagedata.some(ele => ele.lang_name === 'en-us' && ele.url_lang_id === tmpdata.url_lang_id)) {
-              str = tmpdata.value;
-            }
+            break;
+          }
+        }
+        for (let j = 0; j < pagedata.length; j += 1) {
+          if (tmpdata.url_lang_id === pagedata[j].url_lang_id) {
+            tmpdata.name = `${pagedata[j].name}(${pagedata[j].lang_name})`;
             break;
           }
         }
         postdata.push(tmpdata);
       }
+      postdata.sort((val1, val2) => val2.url_lang_id - val1.url_lang_id);
     }
-    this.formRef.childFun(data.name, postdata, str);
+    this.formRef.childFun(data.name, postdata);
   }
 
   submit(savedata, updata, callback) {
@@ -99,11 +102,11 @@ class EditableTable extends Component {
         const tmp = tmpvalues[i];
         const tmpdata = {
           key: item.name,
-          lang_id: Number(tmp[0]),
+          url_lang_id: Number(tmp[0]),
           value: tmp[1],
         };
         rawdata.forEach((e) => {
-          if (tmpdata.lang_id === e.lang_id && item.name === e.key) {
+          if (tmpdata.url_lang_id === e.url_lang_id && item.name === e.key) {
             tmpdata.id = e.id;
           }
         })
@@ -140,10 +143,11 @@ class EditableTable extends Component {
         onCancel={() => { this.setState({ visible: false }) }}
       >
         <Table
-          bordered
           dataSource={this.state.dataSource}
           columns={this.columns}
+          pagination={false}
           rowClassName="editable-row"
+          scroll={{ x: 1000 }}
         />
         <div className="ant-btn-right">
           <Button className="login-form-button" type="primary" onClick={this.handleSubmit}>提交</Button>

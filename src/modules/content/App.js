@@ -46,27 +46,23 @@ class App extends Component {
       done: (e) => {
         const val = e.data;
         const tmpdata = [];
-        let str = '';
         const values = JSON.parse(sessionStorage.getItem('pagedata'));
-        const pagedata = JSON.parse(sessionStorage.getItem('pagedata'));
         for (let i = 0; i < values.length; i += 1) {
           const tmp = {
-            name: values[i].name,
+            name: `${values[i].name}(${values[i].lang_name})`,
             url_lang_id: values[i].url_lang_id,
+            value: '',
           };
           for (let index = 0; index < val.length; index += 1) {
             const item = val[index];
             if (tmp.url_lang_id === item.url_lang_id) {
               tmp.value = item.value;
               tmp.id = item.id;
-              if (pagedata.some(ele => ele.lang_name === 'en-us' && ele.url_lang_id === tmp.url_lang_id)) {
-                str = tmp.value;
-              }
             }
           }
           tmpdata.push(tmp);
         }
-        this.formRef.childFun(datatype, tmpdata, str);
+        this.formRef.childFun(datatype, tmpdata);
       },
     });
   }

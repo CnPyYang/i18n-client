@@ -3,6 +3,15 @@ import { Modal, Button, Input, Table } from 'antd';
 
 import Request from '../../commons/utils/request';
 
+function copyUrl(text, ele) {
+  const id = text || ele;
+  if (document.execCommand) {
+    const tmp = document.getElementById(id);
+    tmp.select();
+    document.execCommand('Copy');
+  }
+}
+
 class Cdn extends Component {
   constructor() {
     super();
@@ -11,26 +20,23 @@ class Cdn extends Component {
       dataname: '页面国际化',
       site: '',
       dataSource: [],
+      display: 'none',
     }
     this.columns = [
       {
         title: '路径',
         dataIndex: 'pathname',
-        width: 100,
-      }, {
-        title: 'cdn地址',
-        dataIndex: 'url',
-        width: 100,
+        width: 150,
+        align: 'center',
       }, {
         title: '操作',
         dataIndex: 'operation',
-        width: 100,
-        render: (text, record) => <a href={record.url}>下载</a>,
+        align: 'center',
+        render: (text, record) => <div><Input id={record.key} className="cdnInput" readOnly value={record.url} /><Button onClick={() => copyUrl(text, record.key)}>复制</Button></div>,
       },
     ]
-    this.getCdn = this.getCdn.bind(this)
+    this.getCdn = this.getCdn.bind(this);
   }
-  // render: (text, record) => <Button onClick={() => this.edit(text, record)}>下载</Button>,
 
   getCdn() {
     Request.post({
@@ -47,17 +53,7 @@ class Cdn extends Component {
             key: i.toString(),
           })
         }
-        this.setState({ site: res.data.site, dataSource: sourse });
-      },
-    })
-  }
-
-  handleSubmit() {
-    Request.post({
-      url: '/kv/update',
-      data: { pathname: window.location.pathname },
-      done: () => {
-        this.setState({ visible: false });
+        this.setState({ site: res.data.site, dataSource: sourse, display: '' });
       },
     })
   }
@@ -71,16 +67,22 @@ class Cdn extends Component {
         width="50%"
         onCancel={() => { this.setState({ visible: false }) }}
       >
-        <div>
-          <Input className="cdnInput" placeholder="请点击获取按钮,查询CDN地址" disabled value={this.state.site} />
-          <Button type="primary" onClick={this.getCdn}>获取</Button>
+        <div style={{ marginBottom: 10 }}>
+          <Button type="primary" onClick={this.getCdn}>生成CDN</Button>
         </div>
-        <Table
-          bordered
-          dataSource={this.state.dataSource}
-          columns={this.columns}
-          rowClassName="editable-row"
-        />
+        <div style={{ display: this.state.display }}>
+          <div style={{ marginBottom: 10 }}>主域CDN</div>
+          <Input id="cdnId" readOnly className="cdnInput" value={this.state.site} />
+          <Button onClick={() => copyUrl('cdnId')}>复制</Button>
+
+          <div style={{ marginTop: 10 }}>子域CDN</div>
+          <Table
+            dataSource={this.state.dataSource}
+            columns={this.columns}
+            pagination={false}
+            rowClassName="editable-row"
+          />
+        </div>
       </Modal>
     );
   }

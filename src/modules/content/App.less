@@ -14,11 +14,12 @@
     margin-top: 10px;
   }
 }
-.ant-btn-primary{
-  float: right;
-}
 .ant-btn-right{
   height: 32px;
+  .ant-btn-primary{
+    float: right;
+    margin-top: 10px;
+  }
   a{
     float: right;
   }
@@ -39,7 +40,13 @@ table tr td{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 300px;
+  max-width: 255px;
+}
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td{
+  padding: 10px !important;
+  border-top: 1px !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
 }
 .iframe-dispaly{
   width: 100%;
@@ -49,5 +56,22 @@ table tr td{
   border: 1px solid #d9d9d9;
 }
 .cdnInput {
-  width: calc(100% - 100px);
-} 
+  width: calc(100% - 70px);
+}
+.ant-checkbox-group-item{
+  display: block !important;
+  margin-bottom: 15px !important;
+}
+.ant-col-8{
+  padding-left: 24px;
+  .transMa{
+    margin: 0 10px 10px 10px;
+    text-align: center;
+    button{
+      margin: 10px;
+    }
+  }
+  button{
+    margin: 10px 0;
+  }
+}

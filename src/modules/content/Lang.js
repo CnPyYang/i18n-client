@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Checkbox, Modal, Popconfirm, message, Button } from 'antd';
+import { Form, Checkbox, Modal, message, Button } from 'antd';
 
 import Request from '../../commons/utils/request';
 
@@ -8,6 +8,7 @@ let Lang = [];
 let List = [];
 let add = [];
 let del = [];
+
 class Language extends Component {
   constructor(props) {
     super(props);
@@ -23,7 +24,8 @@ class Language extends Component {
       Title: '未修改内容，请确定',
     };
     this.onChange = this.onChange.bind(this)
-    this.Submit = this.Submit.bind(this)
+    this.confirm = this.confirm.bind(this)
+    this.cancel = this.cancel.bind(this)
   }
 
   onChange(checkedList) {
@@ -47,14 +49,14 @@ class Language extends Component {
     })
     nowdata.forEach((ele) => {
       const boo = this.props.theLang.some(val => ele.id === val.lang_id)
-      if (boo) {
+      if (!boo) {
         addname.push(ele.name)
         adddata.push({ lang_id: ele.id, hostname: window.location.hostname })
       }
     })
     this.props.theLang.forEach((ele) => {
       const boo = nowdata.some(val => ele.lang_id === val.id)
-      if (boo) {
+      if (!boo) {
         delname.push(ele.name)
         deldata.push(ele.id)
       }
@@ -66,7 +68,7 @@ class Language extends Component {
       str = `你确定新增 （ ${addname.join(',')} ） 删除 （ ${delname.join(',')} ）吗?`;
     } else if (addname.length > 0 && delname.length === 0) {
       str = `你确定新增 （ ${addname.join(',')} ）吗?`;
-    } else {
+    } else if (addname.length === 0 && delname.length > 0) {
       str = `你确定删除 （ ${delname.join(',')} ） 吗?`;
     }
     this.setState({ Title: str });
@@ -99,7 +101,7 @@ class Language extends Component {
         }
         data.sort((val1, val2) => val1.lang_id - val2.lang_id); // 本页语言按lang_id排序
         sessionStorage.setItem('pagedata', JSON.stringify(data));
-        console.log(this, data)
+        console.log(this)
       },
     })
   }
@@ -119,6 +121,41 @@ class Language extends Component {
     })
   }
 
+  confirm() {
+    const that = this;
+    if (this.state.Title === '未修改内容，请确定') {
+      this.setState({ visible: false })
+    } else {
+      Modal.confirm({
+        title: this.state.Title,
+        onOk() {
+          that.Submit();
+        },
+        okText: '确认',
+        cancelText: '取消',
+      });
+    }
+  }
+
+  cancel() {
+    const that = this;
+    if (this.state.Title === '未修改内容，请确定') {
+      this.setState({ visible: false });
+    } else {
+      Modal.confirm({
+        title: this.state.Title,
+        onOk() {
+          that.Submit();
+        },
+        onCancel() {
+          that.setState({ visible: false });
+        },
+        okText: '确认',
+        cancelText: '取消',
+      });
+    }
+  }
+
   render() {
     return (
       <Modal
@@ -126,15 +163,14 @@ class Language extends Component {
         footer={null}
         visible={this.state.visible}
         width="30%"
-        onCancel={() => { this.setState({ visible: false }) }}
+        onCancel={this.cancel}
+        okText="确认"
+        cancelText="取消"
       >
         <CheckboxGroup options={Lang} value={this.state.List} onChange={this.onChange} />
         <br />
         <div className="ant-btn-right">
-          <Popconfirm title={this.state.Title} onConfirm={this.Submit} okText="确定" cancelText="取消">
-            {/* <a href="/#">提交</a> */}
-            <Button className="login-form-button" type="primary">提交</Button>
-          </Popconfirm>
+          <Button className="login-form-button" type="primary" onClick={this.confirm}>提交</Button>
         </div>
       </Modal>
     );

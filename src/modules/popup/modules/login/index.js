@@ -4,12 +4,10 @@ import { Form, Icon, Input, Button } from 'antd';
 import Request from '../../../../commons/utils/request';
 import Cookies from '../../../../commons/utils/cookies';
 import constants from '../../../../commons/constants';
-import config from '../../../../commons/config';
 
 import './index.less';
 
 const { COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME } = constants;
-const { host } = config;
 const FormItem = Form.Item;
 
 function hasErrors(fieldsError) {
@@ -44,12 +42,10 @@ class Login extends Component {
             this.setState({ errMsg: data.errMsg });
             // return;
           }
-
-          // 传给 content 去保存
           Cookies.multiSet([
-            [COOKIE_TOKEN, data.access_token, `.${host}`],
-            [COOKIE_USER_ID, data.user.id.toString(), `.${host}`],
-            [COOKIE_USER_NAME, values.username, `.${host}`],
+            [COOKIE_TOKEN, data.access_token],
+            [COOKIE_USER_ID, data.user.id.toString()],
+            [COOKIE_USER_NAME, values.username],
           ], () => {
             this.props.changeLogin(true);
           });

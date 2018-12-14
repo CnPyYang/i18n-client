@@ -1,16 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Request from '../../commons/utils/request';
-import constants from '../../commons/constants';
+// import constants from '../../commons/constants';
 import App from './App';
 import EditableTable from './Index';
-import Err from './Err';
+// import Err from './Err';
 import Language from './Lang';
 import Cdn from './Cdn';
 
 let language = [];
 const allNational = [];
-const { COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME } = constants;
+// const { COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME } = constants;
 
 // 单个翻译
 const injectRootDom = () => {
@@ -178,6 +178,17 @@ const sendMessage = (action, data, url, callback = () => {}) => {
   });
 }
 
+const getRootDom = () => {
+  Request.get({
+    url: '/languages',
+    done: (data) => {
+      language = data.languages;
+      sessionStorage.setItem('language', JSON.stringify(language))
+      injectRootDom();
+    },
+  });
+}
+
 const contentjs = {
   oneTrans(val) {
     const tmpDiv = document.querySelectorAll('[data-type]');
@@ -202,6 +213,7 @@ const contentjs = {
       case 'all': AllInjectDom(); break;
       case 'language': menegeLang(); break;
       case 'cdn': menegeCdn(); break;
+      case 'start': getRootDom(); break;
       default: break;
     }
   },
@@ -218,25 +230,6 @@ const contentjs = {
 }
 
 contentjs.listenerCount();
-
-const getRootDom = () => {
-  Request.get({
-    url: '/languages',
-    done: (data) => {
-      if (data.errCode === 2001) {
-        sendMessage('user_token', [COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME], window.location.href);
-        const div = document.createElement('div');
-        div.setAttribute('id', 'chrome-err');
-        document.body.appendChild(div);
-        ReactDOM.render(<Err err={data.errMsg} />, document.getElementById('chrome-err'));
-      } else if (!data.errCode) {
-        language = data.languages;
-        sessionStorage.setItem('language', JSON.stringify(language))
-        injectRootDom();
-      }
-    },
-  });
-}
 
 export {
   getRootDom,

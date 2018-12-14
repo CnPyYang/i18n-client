@@ -30,8 +30,7 @@ class Menus extends Component {
     this.onetranslate = this.onetranslate.bind(this);
   }
 
-  componentWillMount() {
-    console.log(this)
+  componentWillMount() {// eslint-disable-line
     Cookies.get(COOKIE_USER_NAME, ({ value }) => {
       this.setState({
         userName: value,
@@ -57,22 +56,19 @@ class Menus extends Component {
     }
   }
 
-  alltranslate() {
-    console.log(this);
+  alltranslate() {// eslint-disable-line
     const action = 'all';
     const data = true;
     sendMess(action, data, () => {});
   }
 
-  menegelang() {
-    console.log(this);
+  menegelang() {// eslint-disable-line
     const action = 'language';
     const data = true;
     sendMess(action, data, () => {});
   }
 
-  cdn() {
-    console.log(this);
+  cdn() {// eslint-disable-line
     const action = 'cdn';
     const data = true;
     sendMess(action, data, () => {});

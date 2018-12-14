@@ -1,12 +1,20 @@
 
 import axios from 'axios';
 import Cookie from 'fe-utils/cookie';
-
+import React from 'react';
+import ReactDOM from 'react-dom';
 import config from '../config';
 import constants from '../constants';
+import Err from '../../modules/content/Err';
 
 const { baseUrl } = config;
-const { COOKIE_TOKEN } = constants;
+const { COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME } = constants;
+
+const sendMessage = (action, data, url, callback = () => {}) => {
+  chrome.runtime.sendMessage({ _from: 'content', action, data, url }, (tmp, sender, response) => {
+    callback(tmp, sender, response);
+  });
+}
 
 const request = {
   checkParams(params) {
@@ -62,7 +70,13 @@ const request = {
   defaultParamsCallback(response, params) {
     response.then((res) => {
       const { data } = res;
-
+      if (data.errCode === 2001) {
+        sendMessage('user_token', [COOKIE_TOKEN, COOKIE_USER_ID, COOKIE_USER_NAME], window.location.href);
+        const div = document.createElement('div');
+        div.setAttribute('id', 'chrome-err');
+        document.body.appendChild(div);
+        ReactDOM.render(<Err err={data.errMsg} />, document.getElementById('chrome-err'));
+      }
       if (data && data.errCode) {
         console.error(`${res.config.method}\u8BF7\u6C42 err:`, JSON.stringify(data), { url: res.config.url });
       }

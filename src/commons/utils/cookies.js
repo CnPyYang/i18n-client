@@ -17,7 +17,7 @@ const Cookies = {
     chrome.tabs.getSelected(null, ({ url }) => {
       chrome.cookies.set({
         url,
-        domain,
+        // domain,
         name,
         value,
       }, (cookie) => {
@@ -40,7 +40,6 @@ const Cookies = {
               url,
               name: set[0],
               value: set[1],
-              domain: set[2],
             }, (cookie) => {
               resolve(cookie);
             });
@@ -64,9 +63,6 @@ const Cookies = {
 
       })
     });
-    // chrome.cookies.getAll({}, (cookies) => {
-    //   console.log(222, cookies);
-    // });
   },
 }
 

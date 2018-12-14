@@ -14,11 +14,11 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://*.candy.one/*", "https://*.candy.one/*"],
+      "matches": ["http://*/*", "https://*/*"],
       "js": ["modules/vendor/vendor.js", "modules/content/content.js"],
       "all_frames": true
     }
   ],
-  "permissions": ["http://*.candy.one/*", "https://*.candy.one/*", "cookies"],
+  "permissions": ["http://*/*", "https://*/*", "cookies"],
   "content_security_policy": "default-src 'self'; script-src 'self' http://127.0.0.1:3000 http://localhost:3000 'unsafe-eval'; connect-src http://127.0.0.1:7001 http://localhost:7001; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
 }

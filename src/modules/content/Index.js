@@ -21,7 +21,7 @@ class EditableTable extends Component {
         align: 'center',
         fixed: 'left',
       },
-    ];
+    ]
     this.state.pagedata.forEach((item) => {
       this.columns.push({
         title: `${item.name}(${item.lang_name})`,

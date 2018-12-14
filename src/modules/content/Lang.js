@@ -74,7 +74,7 @@ class Language extends Component {
     this.setState({ Title: str });
   }
 
-  savesession() {
+  savesession() {// eslint-disable-line
     const postdata = {
       hostname: window.location.hostname,
     };
@@ -101,7 +101,6 @@ class Language extends Component {
         }
         data.sort((val1, val2) => val1.lang_id - val2.lang_id); // 本页语言按lang_id排序
         sessionStorage.setItem('pagedata', JSON.stringify(data));
-        console.log(this)
       },
     })
   }

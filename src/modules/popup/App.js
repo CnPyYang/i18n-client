@@ -4,6 +4,7 @@ import Login from './modules/login';
 import Menus from './modules/menus';
 import constants from '../../commons/constants';
 import Cookies from '../../commons/utils/cookies';
+
 import './App.less';
 
 const { COOKIE_TOKEN } = constants;
@@ -11,7 +12,10 @@ const { COOKIE_TOKEN } = constants;
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { isLogin: false, checkLogin: props.tokenExpired };
+    this.state = {
+      isLogin: false,
+      checkLogin: props.tokenExpired,
+    };
   }
 
   componentWillMount() {

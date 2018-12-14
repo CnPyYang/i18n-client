@@ -35,7 +35,6 @@ const popupjs = {
 
   listen() {
     this.onMessage(({ _from, action, data, url }, sender, response) => {
-      console.log(data)
       const params = [{ action, data, url }, sender, response];
       if (_from === 'content') {
         this.listenContent(...params);

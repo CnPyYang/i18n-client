@@ -31,6 +31,17 @@ class Menus extends Component {
   }
 
   componentWillMount() {// eslint-disable-line
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const action = 'start'
+      const data = true
+      let tabId = '';
+      if (tabs.length > 0) {
+        tabId = tabs[0].id
+      } else {
+        return;
+      }
+      chrome.tabs.sendMessage(tabId, { _from: 'popup', action, data }, () => {});
+    });
     Cookies.get(COOKIE_USER_NAME, ({ value }) => {
       this.setState({
         userName: value,

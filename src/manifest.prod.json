@@ -1,8 +1,8 @@
 {
   "version": "1.0.0",
-  "name": "react-chrome-extension-boilerplate",
+  "name": "i18n-translate",
   "manifest_version": 2,
-  "description": "Example for react-chrome-extension-boilerplate",
+  "description": "方便研发人员进行语言国际化的开发",
   "browser_action": {
     "default_icon": "assets/images/icon.png",
     "default_title": "default_title",

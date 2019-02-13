@@ -19,17 +19,6 @@ class App extends Component {
   }
 
   componentWillMount() {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const action = 'start'
-      const data = true
-      let tabId = '';
-      if (tabs.length > 0) {
-        tabId = tabs[0].id
-      } else {
-        return;
-      }
-      chrome.tabs.sendMessage(tabId, { _from: 'popup', action, data }, () => {});
-    });
     if (this.state.checkLogin) {
       Cookies.get(COOKIE_TOKEN, (cookie) => {
         const isLogin = cookie && !!cookie.value;
